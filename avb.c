@@ -15,6 +15,7 @@
 #include "stubs.h"
 #include "util.h"
 #include "data.h"
+#include "PSGlib.h"
 
 //#include <exec/types.h>
 //#include <exec/memory.h>
@@ -1188,7 +1189,8 @@ void docollisions()
     if (!menuon) {
      avy=abs(320-abs(bvely));
      per=300+avy;jif=per>>5;
-     StartSound(waveform[0],wavelength[0],jif,per,55,i); /* head hit */
+//     StartSound(waveform[0],wavelength[0],jif,per,55,i); /* head hit */
+	 PSGSFXPlay(ballhit_psg, SFX_CHANNEL3);
     }
     bytop=200;
     serve=0;
@@ -1270,8 +1272,7 @@ void putshapes()
  	uint8_t ball_frm, pleft_frm, pright_frm;
 
 	UpdateSounds();
-	SMS_waitForVBlank();
-	SMS_copySpritestoSAT();
+	util_waitVBlankSatPSG();
 
 	/*
 	MoveSprite(AVViewPort,&AVSprites[4],tbx,tby);
@@ -1365,8 +1366,10 @@ void resetpt()
  } while (j-->0 || frameindex[0]!=-1 || frameindex[1]!=-1);
 // *dmaconw=0x000F;
  if (i==server) {
-  if (!menuon)
-   StartSound(waveform[2],wavelength[2],JIF2,PER2,63,3-i); /* point scored */
+  if (!menuon) {
+   //StartSound(waveform[2],wavelength[2],JIF2,PER2,63,3-i); /* point scored */
+   PSGSFXPlay(sifflet_psg, SFX_CHANNEL2);
+  }
   score[i]++;
   if (score[i]>14 && score[i]-score[1-i]>1) endgame=1;
   sprintf(scrstr,"%02d",score[server]);
@@ -1378,8 +1381,10 @@ void resetpt()
   printf(scrstr);
  }
  else {
-  if (!menuon)
-   StartSound(waveform[1],wavelength[1],JIF1,PER1,63,2+i); /* serve lossed */
+  if (!menuon) {
+   //StartSound(waveform[1],wavelength[1],JIF1,PER1,63,2+i); /* serve lossed */
+   PSGSFXPlay(failed_psg, SFX_CHANNEL2);
+  }
   server=i;
   SetAPen(TitleRastPort,6);
   if (server) {

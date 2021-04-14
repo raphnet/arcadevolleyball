@@ -19,7 +19,7 @@ struct SimpleSprite
 #define XCNV(a)	((a) - ((a) >> 2) + ((a) >> 5) + 7)
 //#define YCNV(a) ((a) > 191 ? 191 : (a))
 //#define YCNV(a)	((a) - ((a) >> 2))
-#define YCNV(a)	((a) - ((a) >> 4))
+#define YCNV(a)	((a) - ((a) >> 4) - 1)
 
 #define StartSound(...) do { } while(0)
 
