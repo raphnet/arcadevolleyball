@@ -16,6 +16,7 @@
 #include "util.h"
 #include "data.h"
 #include "PSGlib.h"
+#include "inlib.h"
 
 //#include <exec/types.h>
 //#include <exec/memory.h>
@@ -780,6 +781,7 @@ void main()
 
 	SMS_initSprites();
 
+
 	// Ball 0-3
 	util_reserveSprites(4);
 
@@ -789,6 +791,7 @@ void main()
 	// Player right 13,14,15,16,17,18,19,20,21
 	util_reserveSprites(9);
 
+	inlib_init();
 
 	SMS_displayOn();
 /*
@@ -989,20 +992,34 @@ void UpdateSounds()
 int DoMenu()
 {
  int i;
- static int opt=0;
+ static int opt=0, last_opt = -1;
  static int reprint=1;
 // static int timer=0;
 // static USHORT lastjoy = 0xFFFF;
 // USHORT *joy = (USHORT *)0xDFF00C;
 // USHORT *firereg = (USHORT *)0xBFE0FE;
 
-  if (SMS_getKeysPressed() & PORT_A_KEY_DOWN) {
-   opt++;if (opt>=N_MENU_ENTRIES) opt=0;
-   reprint=1;
+
+  if (inlib_port1.type == INLIB_TYPE_PADDLE)
+  {
+#if N_MENU_ENTRIES != 4
+#error Broken code
+#endif
+	  opt = inlib_port1.paddle.value >> 6;
+	  if (opt != last_opt) {
+		  reprint = 1;
+		  last_opt = opt;
+	  }
   }
-  if (SMS_getKeysPressed() & PORT_A_KEY_UP) {
-   opt--;if (opt<0) opt=N_MENU_ENTRIES-1;
-   reprint=1;
+  else {
+	  if (SMS_getKeysPressed() & PORT_A_KEY_DOWN) {
+	   opt++;if (opt>=N_MENU_ENTRIES) opt=0;
+	   reprint=1;
+	  }
+	  if (SMS_getKeysPressed() & PORT_A_KEY_UP) {
+	   opt--;if (opt<0) opt=N_MENU_ENTRIES-1;
+	   reprint=1;
+	  }
   }
  // timer=0;
  //lastjoy=*joy;
@@ -1026,6 +1043,7 @@ int DoMenu()
  }
 
  if (SMS_getKeysPressed() & PORT_A_KEY_1) {
+
   switch (opt) {
    case 0: opts[0]=opts[1]='H';break;
    case 1: opts[0]='H';opts[1]='C';jflag=1;break;
@@ -1040,6 +1058,11 @@ int DoMenu()
    util_fillScreen(0);
    InitGame();Delay(50);
    reprint=1;
+
+	 // Make sure the button was relased to avoid an instant serve
+	 while (SMS_getKeysStatus() & PORT_A_KEY_1) {
+		 util_waitVBlankSatPSG();
+	 }
   }
  }
  return(!reprint);
@@ -1052,23 +1075,52 @@ static void joystick(int pl)
 	keymove[pl].up=0;
 
 	if (pl == 0) {
-		if (SMS_getKeysStatus() & PORT_A_KEY_1) {
-			keymove[pl].up=1;
-		}
-		if (SMS_getKeysStatus() & PORT_A_KEY_LEFT) {
-			keymove[pl].left=-2;
-		} else if (SMS_getKeysStatus() & PORT_A_KEY_RIGHT) {
-			keymove[pl].left=2;
+
+		if (inlib_port1.type == INLIB_TYPE_PADDLE) {
+			x[pl] = 3 + inlib_port1.paddle.value/2;
+			if (x[pl] > 119) {
+				x[pl] = 119;
+			}
+
+			if (inlib_port1.paddle.buttons & PADDLE_BUTTON) {
+				keymove[pl].up=1;
+			}
+
+		} else {
+
+			if (SMS_getKeysStatus() & PORT_A_KEY_1) {
+				keymove[pl].up=1;
+			}
+			if (SMS_getKeysStatus() & PORT_A_KEY_LEFT) {
+				keymove[pl].left=-2;
+			} else if (SMS_getKeysStatus() & PORT_A_KEY_RIGHT) {
+				keymove[pl].left=2;
+			}
 		}
 	}
 	else {
-		if (SMS_getKeysStatus() & PORT_B_KEY_1) {
-			keymove[pl].up=1;
-		}
-		if (SMS_getKeysStatus() & PORT_B_KEY_LEFT) {
-			keymove[pl].left=-2;
-		} else if (SMS_getKeysStatus() & PORT_B_KEY_RIGHT) {
-			keymove[pl].left=2;
+
+		if (inlib_port2.type == INLIB_TYPE_PADDLE) {
+			x[pl] = 155 + inlib_port2.paddle.value/2;
+			if (x[pl] > 119+155) {
+				x[pl] = 119+155;
+			}
+
+
+			if (inlib_port2.paddle.buttons & PADDLE_BUTTON) {
+				keymove[pl].up=1;
+			}
+		} else {
+
+			if (SMS_getKeysStatus() & PORT_B_KEY_1) {
+				keymove[pl].up=1;
+			}
+			if (SMS_getKeysStatus() & PORT_B_KEY_LEFT) {
+				keymove[pl].left=-2;
+			} else if (SMS_getKeysStatus() & PORT_B_KEY_RIGHT) {
+				keymove[pl].left=2;
+			}
+
 		}
 	}
 }
@@ -1273,6 +1325,7 @@ void putshapes()
 
 	UpdateSounds();
 	util_waitVBlankSatPSG();
+	inlib_poll();
 
 	/*
 	MoveSprite(AVViewPort,&AVSprites[4],tbx,tby);

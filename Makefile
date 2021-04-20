@@ -8,7 +8,7 @@ CFLAGS=-mz80 -I$(DEVKITSMS)/SMSlib/src/ --peep-file $(DEVKITSMS)/SMSlib/src/peep
 LDFLAGS=--no-std-crt0 --data-loc 0xC000 $(DEVKITSMS)/crt0/crt0_sms.rel $(DEVKITSMS)/PSGlib/PSGlib.rel
 
 
-OBJS=avb.rel stubs.rel data.rel util.rel
+OBJS=avb.rel stubs.rel data.rel util.rel inlib.rel
 
 ALL_OBJS=$(OBJS)
 
