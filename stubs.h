@@ -28,7 +28,7 @@ struct SimpleSprite
 #define Move(a, x, y) SMS_setNextTileatXY(XCNV(x) >> 3, YCNV(y) >> 3)
 #define Text(a, txt, l) printf(txt)
 #define RectFill(...) do { } while(0)
-#define Delay(...) do { } while(0)
+#define Delay(...) do { SMS_waitForVBlank(); SMS_waitForVBlank(); SMS_waitForVBlank(); } while(0)
 
 #define WaitBOVP(...)	SMS_waitForVBlank()
 
