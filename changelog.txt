@@ -1,0 +1,4 @@
+Version 1.0 - 2021-04-20 : Initial release
+	  - For 1 or 2 players
+	  - Playable with standard controllers or Paddle (HPD-200 or equivalent)
+	  - Tested on a Japanese SMS and NTSC Megadrive (US)
