@@ -275,7 +275,7 @@ uint8_t util_absdiff(uint8_t a, uint8_t b)
 	return b-a;
 }
 
-void util_waitVBlankSatPSG()
+void util_waitVBlankSatPSG(void)
 {
 	SMS_waitForVBlank();
 	SMS_copySpritestoSAT();

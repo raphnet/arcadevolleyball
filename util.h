@@ -5,7 +5,7 @@
 #endif
 
 
-void util_smsClear();
+void util_smsClear(void);
 
 void drawBox(uint8_t x1, uint8_t y1, uint8_t w, uint8_t h);
 void util_drawBoxFilled(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t fill_tid);
@@ -29,4 +29,4 @@ uint8_t util_converge_linear(uint8_t target, uint8_t cur);
 uint8_t util_converge_linear2(uint8_t target, uint8_t cur);
 uint8_t util_absdiff(uint8_t a, uint8_t b);
 
-void util_waitVBlankSatPSG();
+void util_waitVBlankSatPSG(void);

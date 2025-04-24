@@ -39,17 +39,17 @@
 //struct ViewPort *ViewPortAddress();
 
 static void joystick(int pl);
-void    OpenStuff();
-void    InitShapes();
+void    OpenStuff(void);
+void    InitShapes(void);
 void    Quit(int e);
-USHORT *LoadSample();
-USHORT *AllocateMem();
-void    UpdateSounds();
-void    GetPos();
-int     DoMenu();
-static void    InitGame();
-void    CheckKeyboard();
-void    Game();
+USHORT *LoadSample(void);
+USHORT *AllocateMem(void);
+void    UpdateSounds(void);
+void    GetPos(void);
+int     DoMenu(void);
+static void    InitGame(void);
+void    CheckKeyboard(void);
+void    Game(void);
 
 struct IntuitionBase *IntuitionBase = NULL;
 struct GfxBase *GfxBase = NULL;
@@ -760,14 +760,16 @@ int x[2], px[2], y[2], frame[2], frameindex[2], rebound[2], score[2],
 #define TID_NET_BASE_L 173
 #define TID_NET_BASE_R (TID_NET_BASE_L + 1)
 
-int CXBRK()
+int CXBRK(void)
 {
  return(0);
 }
 
-void main()
+void main(void)
 {
-	SMS_init();
+//	SMS_init();
+
+	SMS_displayOff();
 
 	util_smsClear();
 
@@ -794,6 +796,7 @@ void main()
 	inlib_init();
 
 	SMS_displayOn();
+
 /*
  printf("\n");
  printf("\n");
@@ -809,7 +812,7 @@ void main()
  Quit(0);
 }
 
-void OpenStuff()
+void OpenStuff(void)
 {
 	/*
  waveform[0]=LoadSample("samples/hit.sample",&wavelength[0]);
@@ -833,7 +836,7 @@ void OpenStuff()
  */
 }
 
-void InitShapes()
+void InitShapes(void)
 {
 	/*
  BYTE i;
@@ -968,7 +971,7 @@ USHORT per,vol,chan;
 }
 */
 
-void UpdateSounds()
+void UpdateSounds(void)
 {
 	/*
  int i;
@@ -989,7 +992,7 @@ void UpdateSounds()
  */
 }
 
-int DoMenu()
+int DoMenu(void)
 {
  int i;
  static int opt=0, last_opt = -1;
@@ -1125,7 +1128,7 @@ static void joystick(int pl)
 	}
 }
 
-void GetPos()
+void GetPos(void)
 {
  int i, tx, velx, bnd;
 
@@ -1169,7 +1172,7 @@ void GetPos()
  }
 }
 
-int moveball()
+int moveball(void)
 {
  int rbvelx, rbvely, hitfloor;
 
@@ -1222,7 +1225,7 @@ int moveball()
  return(hitfloor);
 }
 
-void docollisions()
+void docollisions(void)
 {
  int i, dx, dy, dist, rndoff, avy, jif, per;
 
@@ -1316,7 +1319,7 @@ static void move2x2_metasprite(uint8_t id, uint8_t X, uint8_t Y)
 }
 
 
-void putshapes()
+void putshapes(void)
 {
 	uint8_t tmpx,tmpy, i;
 	const uint8_t pleft_tiles[9] = { 96, 97, 98,	112, 113, 114,	128, 129, 130 };
@@ -1386,7 +1389,7 @@ void putshapes()
 	move3x3_metasprite(13, XCNV(x[1]), YCNV(y[1]));
 }
 
-void resetpt()
+void resetpt(void)
 {
  int i, j, tvelx, tvely;
  char scrstr[4] = { 0 };
@@ -1481,7 +1484,7 @@ int destination(int pl, int destx, int tol)
  return(0);
 }
 
-void computer0()
+void computer0(void)
 {
  int ystep, destx, dx, rndoff, dest;
 
@@ -1561,7 +1564,7 @@ void computer0()
    destination(0,56,8);
 }
 
-void computer1()
+void computer1(void)
 {
  int ystep, destx, dx, rndoff, dest;
 
@@ -1641,7 +1644,7 @@ void computer1()
    destination(1,211,8);
 }
 
-void CheckKeyboard()
+void CheckKeyboard(void)
 {
 /*
  struct IntuiMessage *Msg;
@@ -1668,7 +1671,7 @@ void CheckKeyboard()
 
 }
 
-static void InitGame()
+static void InitGame(void)
 {
  int i;
 
@@ -1720,7 +1723,7 @@ static void InitGame()
 
 }
 
-void Game()
+void Game(void)
 {
  int air;
 
