@@ -88,8 +88,8 @@ typedef struct _inlib_data {
 #define SPORTSPAD_BTN_2	0x02
 
 
-void inlib_init();
-void inlib_poll();
+void inlib_init(void);
+void inlib_poll(void);
 
 extern inlib_data inlib_port1, inlib_port2;
 

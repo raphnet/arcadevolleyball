@@ -161,7 +161,7 @@ static void SMS_paddle_undo_meka_workaround(void)
 }
 
 
-static void TH_TR_outputmode()
+static void TH_TR_outputmode(void)
 {
 	// Port A TH and TR pins output
 	port3F = 0xFC;
@@ -216,7 +216,7 @@ static void sportsPad_read(uint8_t *dst)
 
 }
 
-static char detectSportsPad()
+static char detectSportsPad(void)
 {
 	uint8_t data[2];
 	uint8_t i, j;
@@ -245,7 +245,7 @@ static char detectSportsPad()
 }
 
 
-static char detectMouse()
+static char detectMouse(void)
 {
 	uint16_t t;
 
@@ -279,7 +279,7 @@ static char detectMouse()
 	return 1;
 }
 
-static uint8_t detectGraphics2()
+static uint8_t detectGraphics2(void)
 {
 	uint8_t btns;
 
@@ -365,16 +365,16 @@ static void readMouse(uint8_t *dst)
 
 
 
-void inlib_init()
+void inlib_init(void)
 {
 
 	inlib_port1.type = INLIB_TYPE_SMS;
 	inlib_port2.type = INLIB_TYPE_SMS;
 
 	SMS_paddle_meka_workaround();
-
 	// Step 1 : Japanese paddle detection (passive test)
 	SMS_waitForVBlank();
+
 	if (SMS_detectPaddleA()) {
 		inlib_port1.type = INLIB_TYPE_PADDLE;
 	}
@@ -392,69 +392,10 @@ void inlib_init()
 	}
 }
 
-void readLightPhaser1()
-{
-	uint8_t vc;
-	uint8_t x = 0, y = 0;
-	uint8_t trig = 0;
-	uint8_t count = 0;
-	uint8_t first = 1;
-
-	SMS_paddle_undo_meka_workaround();
-	trig = (portDC & 0x10) ? 0 : LIGHTPHASER_TRIG; // Port A TL
-
-	if (trig) {
-
-		// Normally called during vblank. Wait until vblank ends...
-		do {
-			vc = SMS_getVCount();
-		} while ((vc > 192));
-
-		// Monitor TH during the active display area
-		do {
-			vc = SMS_getVCount();
-
-			if (!(portDD & 0x40)) { // Port A TH
-				// Light detected!
-
-				// Record the minimum x and y seen.
-				if (first) {
-					x = SMS_getHCount();
-					y = vc;
-					first = 0;
-				} else {
-					if (SMS_getHCount() < x) {
-						x = SMS_getHCount();
-					}
-					if (vc < y) {
-						y = vc;
-					}
-				}
-			}
-
-		} while (vc < 192);
-
-	}
-
-	// The H counter is 9 bits, and reading it returns the upper 8 bits. 
-	if (x > 0x7f) {
-		inlib_port1.phaser.x = 0xff;
-	} else {
-		inlib_port1.phaser.x = x << 1;
-	}
-	inlib_port1.phaser.y = y;
-	inlib_port1.phaser.buttons = trig;
-}
-
-void inlib_poll()
+void inlib_poll(void)
 {
 	uint8_t tmpdata[4];
 	uint8_t now;
-
-	if (inlib_port1.type == INLIB_TYPE_LIGHT_PHASER) {
-		readLightPhaser1();
-		return;
-	}
 
 	if (inlib_port1.type == INLIB_TYPE_GFX_V2) {
 		readGraphics2(&inlib_port1.gfx2);
@@ -475,7 +416,8 @@ void inlib_poll()
 		now = (SMS_getKeysStatus() & PORT_A_KEY_1) ? PADDLE_BUTTON : 0;
 		inlib_port1.paddle.pressed = now & ~inlib_port1.paddle.buttons;
 		inlib_port1.paddle.buttons = now;
-		inlib_port1.paddle.value = SMS_paddleReadA();
+		//inlib_port1.paddle.value = SMS_paddleReadA();
+		inlib_port1.paddle.value = SMS_readPaddle(0);
 	} else if (inlib_port1.type == INLIB_TYPE_SPORTSPAD) {
 		now = (SMS_getKeysStatus() >> 4) & 3;
 		sportsPad_read(tmpdata);
@@ -493,7 +435,7 @@ void inlib_poll()
 		now = (SMS_getKeysStatus() & PORT_B_KEY_1) ? PADDLE_BUTTON : 0;
 		inlib_port2.paddle.pressed = now & ~inlib_port2.paddle.buttons;
 		inlib_port2.paddle.buttons = now;
-		inlib_port2.paddle.value = SMS_paddleReadB();
+		inlib_port2.paddle.value = SMS_readPaddle(1);
 	} else {
 		now =  SMS_getKeysStatus() >> 6;
 		inlib_port2.sms.pressed = now & ~inlib_port2.sms.buttons;
